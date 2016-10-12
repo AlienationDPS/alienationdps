@@ -23,13 +23,15 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, Spin,
-  StdCtrls, ExtCtrls, LazUTF8, updatecheck, LCLIntf, LMessages;
+  StdCtrls, ExtCtrls, LazUTF8, updatecheck, LCLIntf, LMessages, LCLType;
 
 type
 
   { TFormMain }
 
   TFormMain = class(TForm)
+    ComboBoxWeaponType: TComboBox;
+    LabelWeaponType: TLabel;
     LabelSlot1Title: TLabel;
     LabelSlot1: TLabel;
     LabelCore1: TLabel;
@@ -185,15 +187,21 @@ const
   coretype_clipsize=3;
   coretype_critchance=4;
 
-  core_bonuses:array[1..4] of integer=(16,32,32,7);
-  slot_bonuses:array[1..3] of integer=(4,8,8);
-  synergy_bonuses:array[1..3] of integer=(4,8,8);
+  core_bonuses:array[0..2] of array[1..4] of integer=((16,32,32,7),(16,-16,32,7),(16,16,32,7));
+  slot_bonuses:array[0..2] of array[1..3] of integer=((4,8,8),(4,-4,8),(4,4,8));
+  synergy_bonuses:array[0..2] of array[1..3] of integer=((4,8,8),(4,-4,8),(4,4,8));
 
-  bonus_names:array[1..4] of string=('Damage','Fire rate','Clip size','Crit chance');
+  bonus_names:array[0..2] of array[1..4] of string=(('Damage','Fire rate','Clip size','Crit chance'),('Damage','Charge time','Clip size','Crit chance'),('Damage','Charge rate','Clip size','Crit chance'));
+
+  firerate_units:array[0..2] of string=('shots/sec','sec','/sec');
+  firerate_units_:array[0..2] of string=(' shots/sec',' sec','/sec');
+  damage_units:array[0..2] of string=('HP','HP/sec','HP');
+  damage_per_shot_desc:array[0..2] of string=('Avg dmg per shot','Full pwr dmg per sec','Avg dmg per shot');
+  damage_per_shot_units_:array[0..2] of string=('shot','sec','shot');
 
   app_ver_major=1;
-  app_ver_minor=0;
-  app_ver_str='1.0';
+  app_ver_minor=1;
+  app_ver_str='1.01';
 
 type
   weapon_slot_type=record
@@ -214,7 +222,7 @@ var
   synergy_block_count:integer;
 
   damage,firerate,clipsize,critchance,reloadtime,avgdamagepershot,avgdamageperclip,dps:double;
-  damagebonus,fireratebonus,clipsizebonus,critchancebonus:integer;
+  weapontype,damagebonus,fireratebonus,clipsizebonus,critchancebonus:integer;
 
   calcmode:boolean;
 
@@ -294,6 +302,7 @@ end;
 procedure set_onchange(proc:TNotifyEvent);
 var i:integer;
 begin
+ FormMain.ComboBoxWeaponType.OnChange:=proc;
  FormMain.FloatSpinEditDamage.OnChange:=proc;
  FormMain.FloatSpinEditFireRate.OnChange:=proc;
  FormMain.FloatSpinEditClipSize.OnChange:=proc;
@@ -312,6 +321,8 @@ var t:text;
     name,val:string;
     l,l2:longint;
 begin
+ FormMain.LabelStatus.Caption:='';
+ weapontype:=0;
  set_onchange(nil);
  assign(t,filename);
  filemode:=0;
@@ -325,7 +336,10 @@ begin
   if l>0 then begin val:=copy(name,l+1,length(name)); delete(name,l,length(name)); end else val:='';
   name:=lowercase(name);
 
-  if name='damage' then s2double(val,damage)
+  if name='weapon type' then begin
+   s2l(val,weapontype);
+   if (weapontype<0) or (weapontype>2) then weapontype:=0;
+  end else if name='damage' then s2double(val,damage)
   else if name='fire rate' then s2double(val,firerate)
   else if name='clip size' then begin s2double(val,clipsize); clipsize:=round(clipsize); end
   else if name='crit chance' then s2double(val,critchance)
@@ -352,6 +366,7 @@ begin
  ioresult;
  {$I+}
 
+ FormMain.ComboBoxWeaponType.ItemIndex:=weapontype;
  FormMain.FloatSpinEditDamage.Value:=damage;
  FormMain.FloatSpinEditFireRate.Value:=firerate;
  FormMain.FloatSpinEditClipSize.Value:=clipsize;
@@ -377,6 +392,7 @@ begin
  assign(t,filename);
  {$I-}
  rewrite(t);
+ writeln(t,'Weapon type='+i2s(FormMain.ComboBoxWeaponType.ItemIndex));
  writeln(t,'Damage='+double2s_(FormMain.FloatSpinEditDamage.Value,1));
  writeln(t,'Fire rate='+double2s_(FormMain.FloatSpinEditFireRate.Value,1));
  writeln(t,'Clip size='+double2s_(FormMain.FloatSpinEditClipSize.Value,0));
@@ -409,6 +425,7 @@ end;
 procedure get_stats_slots_and_cores_from_ui;
 var i:integer;
 begin
+ weapontype:=FormMain.ComboBoxWeaponType.ItemIndex;
  damage:=FormMain.FloatSpinEditDamage.Value;
  firerate:=FormMain.FloatSpinEditFireRate.Value;
  clipsize:=FormMain.FloatSpinEditClipSize.Value;
@@ -427,8 +444,8 @@ begin
  slots[num].slotbonus:=0;
  slots[num].corebonus:=0;
  if slots[num].slottype>0 then begin
-  if (slots[num].slottype<4) and ((slots[num].coretype=slots[num].slottype) or (slots[num].coretype=4)) then slots[num].slotbonus:=slot_bonuses[slots[num].slottype]; // core matches slot colour, or prismatic core
-  if slots[num].coretype>0 then slots[num].corebonus:=core_bonuses[slots[num].coretype]; // core in slot
+  if (slots[num].slottype<4) and ((slots[num].coretype=slots[num].slottype) or (slots[num].coretype=4)) then slots[num].slotbonus:=slot_bonuses[weapontype][slots[num].slottype]; // core matches slot colour, or prismatic core
+  if slots[num].coretype>0 then slots[num].corebonus:=core_bonuses[weapontype][slots[num].coretype]; // core in slot
  end;
 end;
 
@@ -479,8 +496,8 @@ begin
    or ((slots[slot_a].coretype=4) and (slots[slot_b].coretype=colour)) // core 1 is prismatic and core 2 matches slot colour
    or ((slots[slot_a].coretype=colour) and (slots[slot_b].coretype=4)) // core 1 matches slot colour and core 2 is prismatic
    or ((slots[slot_a].coretype=4) and (slots[slot_b].coretype=4)) then begin // both cores prismatic
-    inc(slots[slot_a].synergybonus,synergy_bonuses[colour]);
-    inc(slots[slot_b].synergybonus,synergy_bonuses[colour]);
+    inc(slots[slot_a].synergybonus,synergy_bonuses[weapontype][colour]);
+    inc(slots[slot_b].synergybonus,synergy_bonuses[weapontype][colour]);
    end;
   end;
  end;
@@ -505,6 +522,7 @@ end;
 
 procedure calculate_bonuses_and_dps; inline;
 var i:integer;
+    chargetime,fullpowertime,cliptime:double;
 begin
  damagebonus:=0;
  fireratebonus:=0;
@@ -527,14 +545,40 @@ begin
 
  damage:=damage*(1+(damagebonus/100));
  firerate:=firerate*(1+(fireratebonus/100));
+ if firerate<0 then firerate:=0;
  clipsize:=clipsize*(1+(clipsizebonus/100));
  if calcmode then clipsize:=trunc(clipsize); // for 'real world' calc mode, use integer clip sizes
  critchance:=critchance+critchancebonus;
  avgdamagepershot:=damage+((critchance/100)*3*damage);
- avgdamageperclip:=avgdamagepershot*clipsize;
 
- if not calcmode then dps:=avgdamageperclip/(clipsize/firerate+reloadtime)
- else dps:=avgdamageperclip/(clipsize/firerate+(reloadtime/2)); // for 'real world' calc mode, use reloadtime/2
+ case weapontype of
+  0:begin // standard weapon
+   avgdamageperclip:=avgdamagepershot*clipsize;
+   if not calcmode then dps:=avgdamageperclip/(clipsize/firerate+reloadtime)
+   else dps:=avgdamageperclip/(clipsize/firerate+(reloadtime/2)); // for 'real world' calc mode, use reloadtime/2
+  end;
+  1:begin // devastator
+   // not sure of the exact formula for the devastator.
+   // closest i can get is to take 45% average damage during charge time, and 150% average damage for the remainder of the clip.
+   // also needed to extend charge time by 1/8 of the clip bonus percentage, for reasons unknown...
+   // this is still not perfect but it's pretty close to the game.
+   cliptime:=clipsize/30;
+   chargetime:=firerate*(1+(clipsizebonus/800));
+   fullpowertime:=cliptime-chargetime;
+   if fullpowertime<0 then fullpowertime:=0;
+   avgdamageperclip:=avgdamagepershot*(fullpowertime*1.5+chargetime*0.45);
+   if not calcmode then dps:=avgdamageperclip/(cliptime+reloadtime)
+   else dps:=avgdamageperclip/(cliptime+(reloadtime/2)); // for 'real world' calc mode, use reloadtime/2
+  end;
+  2:begin // collapser
+   // full charge time = 1 / charge rate
+   // ammo used per full charge = full charge time * 30
+   // shots per clip = clip size / ammo used per full charge, or (clip size * charge rate) / 30
+   avgdamageperclip:=avgdamagepershot*clipsize*firerate/30;
+   if not calcmode then dps:=avgdamageperclip/(clipsize/30+reloadtime)
+   else dps:=avgdamageperclip/(clipsize/30+(reloadtime/2)); // for 'real world' calc mode, use reloadtime/2
+  end;
+ end;
 end;
 
 procedure display_stats; // updates UI
@@ -544,26 +588,33 @@ const
 var i,i2:integer;
     s:string;
     corecounts:array[1..4] of integer;
+
+ function i2s_(i:integer):string;
+ begin
+  result:=i2s(i);
+  if i>=0 then result:='+'+result;
+ end;
+
 begin
  // weapon bonuses and stats
- s:='Damage: +'+i2s(damagebonus)+'%';
- if damagebonus>0 then s:=s+' ('+double2s(damage,1)+' HP)';
+ s:=bonus_names[weapontype][1]+': '+i2s_(damagebonus)+'%';
+ if damagebonus<>0 then s:=s+' ('+double2s(damage,1)+' HP)';
  FormMain.LabelDamageBonus.Caption:=s;
 
- s:='Fire rate: +'+i2s(fireratebonus)+'%';
- if fireratebonus>0 then s:=s+' ('+double2s(firerate,1)+' shots/sec)';
+ s:=bonus_names[weapontype][2]+': '+i2s_(fireratebonus)+'%';
+ if fireratebonus<>0 then s:=s+' ('+double2s(firerate,1)+firerate_units_[weapontype]+')';
  FormMain.LabelFireRateBonus.Caption:=s;
 
- s:='Clip size: +'+i2s(clipsizebonus)+'%';
- if clipsizebonus>0 then s:=s+' ('+double2s(clipsize,0)+')';
+ s:=bonus_names[weapontype][3]+': '+i2s_(clipsizebonus)+'%';
+ if clipsizebonus<>0 then s:=s+' ('+double2s(clipsize,0)+')';
  FormMain.LabelClipSizeBonus.Caption:=s;
 
- s:='Crit chance: +'+i2s(critchancebonus)+'%';
- if critchancebonus>0 then s:=s+' ('+double2s(critchance,1)+'%)';
+ s:=bonus_names[weapontype][4]+': '+i2s_(critchancebonus)+'%';
+ if critchancebonus<>0 then s:=s+' ('+double2s(critchance,1)+'%)';
  FormMain.LabelCritChanceBonus.Caption:=s;
 
- FormMain.LabelDamagePerShot.Caption:='Damage per shot: '+double2s(avgdamagepershot,0)+' HP';
- FormMain.LabelDamagePerClip.Caption:='Damage per clip: '+double2s(avgdamageperclip,0)+' HP';
+ FormMain.LabelDamagePerShot.Caption:=damage_per_shot_desc[weapontype]+': '+double2s(avgdamagepershot,0)+' HP';
+ FormMain.LabelDamagePerClip.Caption:='Avg dmg per clip: '+double2s(avgdamageperclip,0)+' HP';
  FormMain.LabelDPS.Caption:='DPS: '+double2s(dps,0)+' HP';
 
  for i:=0 to 11 do begin
@@ -580,34 +631,38 @@ begin
   l_t[i].Caption:=s;
 
   // core bonus
-  if slots[i].corebonus>0 then l_c[i].Caption:='Core: '+bonus_names[slots[i].coretype]+' +'+double2s(slots[i].corebonus,0)+'%' else l_c[i].Caption:='';
+  if slots[i].corebonus<>0 then l_c[i].Caption:='Core: '+bonus_names[weapontype][slots[i].coretype]+' '+i2s_(slots[i].corebonus)+'%' else l_c[i].Caption:='';
 
   // slot bonus
-  if slots[i].slotbonus>0 then l_s[i].Caption:='Slot: '+bonus_names[slots[i].slottype]+' +'+double2s(slots[i].slotbonus,0)+'%' else l_s[i].Caption:='';
+  if slots[i].slotbonus<>0 then l_s[i].Caption:='Slot: '+bonus_names[weapontype][slots[i].slottype]+' '+i2s_(slots[i].slotbonus)+'%' else l_s[i].Caption:='';
 
   // synergy bonus
-  if slots[i].synergybonus>0 then l_syn[i].Caption:='Synergy: '+bonus_names[slots[i].slottype]+' +'+i2s(slots[i].synergybonus)+'%' else l_syn[i].Caption:='';
+  if slots[i].synergybonus<>0 then l_syn[i].Caption:='Synergy: '+bonus_names[weapontype][slots[i].slottype]+' '+i2s_(slots[i].synergybonus)+'%' else l_syn[i].Caption:='';
  end;
 
+ // core counts
+ for i:=1 to 4 do corecounts[i]:=0;
+ for i:=0 to 11 do if (slots[i].slottype>0) and (slots[i].coretype>0) and (slots[i].coretype<5) then inc(corecounts[slots[i].coretype]);
+ s:='Cores: '+i2s(corecounts[1])+' red, '+i2s(corecounts[2])+' blue, '+i2s(corecounts[3])+' yellow, '+i2s(corecounts[4])+' prismatic.';
+
  // synergy block display
- if synergy_block_count=0 then FormMain.LabelSynergyBlocks.Caption:=''
- else begin
-  for i:=1 to 4 do corecounts[i]:=0;
-  for i:=0 to 11 do if (slots[i].slottype>0) and (slots[i].coretype>0) and (slots[i].coretype<5) then inc(corecounts[slots[i].coretype]);
-  s:='Cores: '+i2s(corecounts[1])+' red, '+i2s(corecounts[2])+' blue, '+i2s(corecounts[3])+' yellow, '+i2s(corecounts[4])+' prismatic.';
+ if synergy_block_count>0 then begin
   s:=s+' Synergy:';
   for i:=0 to synergy_block_count-1 do begin
    s:=s+' ['+i2s(synergy_blocks[i].slot[0]+1);
    for i2:=1 to synergy_blocks[i].slotcount-1 do s:=s+'=='+i2s(synergy_blocks[i].slot[i2]+1);
    s:=s+']';
   end;
-  FormMain.LabelSynergyBlocks.Caption:=s;
  end;
+ FormMain.LabelSynergyBlocks.Caption:=s;
 end;
 
 procedure TFormMain.CalcUpdate(Sender: TObject);
 begin
  get_stats_slots_and_cores_from_ui;
+ LabelFireRate.Caption:=bonus_names[weapontype][2];
+ LabelFireRate_.Caption:=firerate_units[weapontype];
+ LabelDamage_.Caption:=damage_units[weapontype];
  get_slot_and_core_bonuses;
  get_synergy_blocks_from_slot_colours;
  apply_all_synergy_block_bonuses;
@@ -882,6 +937,17 @@ begin
  if SaveDialog1.Execute then write_config(SaveDialog1.FileName);
 end;
 
+procedure autosize_combobox(var c:TComboBox);
+var i,width:integer;
+    maxwidth:integer=0;
+begin
+ for i:=0 to c.Items.Count-1 do begin
+  width:=c.Canvas.TextWidth(c.Items[i]);
+  if width>maxwidth then maxwidth:=width;
+ end;
+ c.Width:=maxwidth+GetSystemMetrics(SM_CXVSCROLL){$ifdef MSWindows}*2{$else}*3{$endif};
+end;
+
 procedure TFormMain.FormShow(Sender: TObject);
 var i:integer;
 begin
@@ -890,7 +956,12 @@ begin
  LabelStatus.Constraints.MinHeight:=LabelStatus.Height;
  LabelStatus.Caption:='';
 
- if LabelStatus.Top<LabelSynergy9Bonus.Top+LabelSynergy9Bonus.Height+16 then LabelStatus.Anchors:=[akTop,akRight,akBottom,akLeft];
+ autosize_combobox(ComboBoxWeaponType);
+ if ComboBoxWeaponType.Width<FloatSpinEditDamage.Width then ComboBoxWeaponType.Width:=FloatSpinEditDamage.Width;
+ autosize_combobox(ComboBoxCalcMode);
+
+ i:=LabelSynergy9Bonus.Top+LabelSynergy9Bonus.Height+16-LabelStatus.Top;
+ if i>0 then GroupBoxSlots.Constraints.MinHeight:=GroupBoxSlots.Height+i;
 
  if GroupBoxWeaponStats.Height<GroupBoxSlots.Height then GroupBoxWeaponStats.Constraints.MinHeight:=GroupBoxSlots.Height
  else GroupBoxSlots.Constraints.MinHeight:=GroupBoxWeaponStats.Height;
@@ -922,6 +993,7 @@ end;
 
 begin
 
+ weapontype:=0;
  damage:=1000;
  firerate:=20;
  clipsize:=25;

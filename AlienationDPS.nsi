@@ -2,7 +2,7 @@
 
 !define bits "32"
 ; "64" for 64 bit, any non-empty string for 32 bit
-!define Version "1.0"
+!define Version "1.01"
 !define AppName "Alienation Weapon DPS Calculator"
 !define AppShortName "AlienationDPS"
 !define ExeName "AlienationDPS.exe"

@@ -20,13 +20,13 @@ object FormMain: TFormMain
     AnchorSideTop.Control = Owner
     AnchorSideRight.Side = asrBottom
     Left = 4
-    Height = 478
+    Height = 512
     Top = 4
     Width = 166
     AutoSize = True
     BorderSpacing.Around = 4
     Caption = 'Base weapon stats'
-    ClientHeight = 458
+    ClientHeight = 492
     ClientWidth = 162
     TabOrder = 0
     object FloatSpinEditDamage: TFloatSpinEdit
@@ -35,24 +35,25 @@ object FormMain: TFormMain
       AnchorSideTop.Side = asrBottom
       Left = 8
       Height = 23
-      Top = 27
+      Top = 81
       Width = 96
       DecimalPlaces = 1
       Increment = 0.1
       MaxValue = 2000000
       MinValue = 0
-      TabOrder = 0
+      TabOrder = 1
       Value = 0
     end
     object LabelDamage: TLabel
       AnchorSideLeft.Control = GroupBoxWeaponStats
-      AnchorSideTop.Control = GroupBoxWeaponStats
+      AnchorSideTop.Control = ComboBoxWeaponType
+      AnchorSideTop.Side = asrBottom
       Left = 8
       Height = 15
-      Top = 8
+      Top = 62
       Width = 44
       BorderSpacing.Left = 4
-      BorderSpacing.Top = 4
+      BorderSpacing.Top = 8
       BorderSpacing.Around = 4
       Caption = 'Damage'
       ParentColor = False
@@ -63,10 +64,10 @@ object FormMain: TFormMain
       AnchorSideTop.Side = asrBottom
       Left = 8
       Height = 15
-      Top = 66
+      Top = 116
       Width = 42
       BorderSpacing.Left = 4
-      BorderSpacing.Top = 12
+      BorderSpacing.Top = 8
       BorderSpacing.Around = 4
       Caption = 'Fire rate'
       ParentColor = False
@@ -77,13 +78,13 @@ object FormMain: TFormMain
       AnchorSideTop.Side = asrBottom
       Left = 8
       Height = 23
-      Top = 85
+      Top = 135
       Width = 96
       DecimalPlaces = 1
       Increment = 0.1
       MaxValue = 1000
       MinValue = 0.1
-      TabOrder = 1
+      TabOrder = 2
       Value = 1
     end
     object LabelClipSize: TLabel
@@ -92,10 +93,10 @@ object FormMain: TFormMain
       AnchorSideTop.Side = asrBottom
       Left = 8
       Height = 15
-      Top = 124
+      Top = 170
       Width = 43
       BorderSpacing.Left = 4
-      BorderSpacing.Top = 12
+      BorderSpacing.Top = 8
       BorderSpacing.Around = 4
       Caption = 'Clip size'
       ParentColor = False
@@ -106,13 +107,13 @@ object FormMain: TFormMain
       AnchorSideTop.Side = asrBottom
       Left = 8
       Height = 23
-      Top = 143
+      Top = 189
       Width = 96
       DecimalPlaces = 0
       Increment = 1
       MaxValue = 1000
       MinValue = 1
-      TabOrder = 2
+      TabOrder = 3
       Value = 1
     end
     object LabelCritChance: TLabel
@@ -121,10 +122,10 @@ object FormMain: TFormMain
       AnchorSideTop.Side = asrBottom
       Left = 8
       Height = 15
-      Top = 182
+      Top = 224
       Width = 60
       BorderSpacing.Left = 4
-      BorderSpacing.Top = 12
+      BorderSpacing.Top = 8
       BorderSpacing.Around = 4
       Caption = 'Crit chance'
       ParentColor = False
@@ -135,13 +136,13 @@ object FormMain: TFormMain
       AnchorSideTop.Side = asrBottom
       Left = 8
       Height = 23
-      Top = 201
+      Top = 243
       Width = 96
       DecimalPlaces = 1
       Increment = 0.1
       MaxValue = 100
       MinValue = 0
-      TabOrder = 3
+      TabOrder = 4
       Value = 0
     end
     object LabelReloadTime: TLabel
@@ -150,10 +151,10 @@ object FormMain: TFormMain
       AnchorSideTop.Side = asrBottom
       Left = 8
       Height = 15
-      Top = 240
+      Top = 278
       Width = 63
       BorderSpacing.Left = 4
-      BorderSpacing.Top = 12
+      BorderSpacing.Top = 8
       BorderSpacing.Around = 4
       Caption = 'Reload time'
       ParentColor = False
@@ -164,13 +165,13 @@ object FormMain: TFormMain
       AnchorSideTop.Side = asrBottom
       Left = 8
       Height = 23
-      Top = 259
+      Top = 297
       Width = 96
       DecimalPlaces = 1
       Increment = 0.1
       MaxValue = 10
       MinValue = 0
-      TabOrder = 4
+      TabOrder = 5
       Value = 0
     end
     object LabelDamage_: TLabel
@@ -181,7 +182,7 @@ object FormMain: TFormMain
       AnchorSideRight.Side = asrBottom
       Left = 108
       Height = 15
-      Top = 31
+      Top = 85
       Width = 16
       BorderSpacing.Around = 4
       Caption = 'HP'
@@ -194,7 +195,7 @@ object FormMain: TFormMain
       AnchorSideTop.Side = asrCenter
       Left = 108
       Height = 15
-      Top = 89
+      Top = 139
       Width = 50
       BorderSpacing.Around = 4
       Caption = 'shots/sec'
@@ -207,7 +208,7 @@ object FormMain: TFormMain
       AnchorSideTop.Side = asrCenter
       Left = 108
       Height = 15
-      Top = 205
+      Top = 247
       Width = 10
       BorderSpacing.Around = 4
       Caption = '%'
@@ -220,7 +221,7 @@ object FormMain: TFormMain
       AnchorSideTop.Side = asrCenter
       Left = 108
       Height = 15
-      Top = 263
+      Top = 301
       Width = 17
       BorderSpacing.Around = 4
       Caption = 'sec'
@@ -232,7 +233,7 @@ object FormMain: TFormMain
       AnchorSideTop.Side = asrBottom
       Left = 4
       Height = 15
-      Top = 352
+      Top = 386
       Width = 105
       BorderSpacing.Left = 4
       BorderSpacing.Right = 4
@@ -246,7 +247,7 @@ object FormMain: TFormMain
       AnchorSideTop.Side = asrBottom
       Left = 4
       Height = 15
-      Top = 367
+      Top = 401
       Width = 103
       BorderSpacing.Left = 4
       BorderSpacing.Right = 4
@@ -259,7 +260,7 @@ object FormMain: TFormMain
       AnchorSideTop.Side = asrBottom
       Left = 4
       Height = 15
-      Top = 382
+      Top = 416
       Width = 102
       BorderSpacing.Left = 4
       BorderSpacing.Right = 4
@@ -272,7 +273,7 @@ object FormMain: TFormMain
       AnchorSideTop.Side = asrBottom
       Left = 4
       Height = 15
-      Top = 397
+      Top = 431
       Width = 120
       BorderSpacing.Left = 4
       BorderSpacing.Right = 4
@@ -286,7 +287,7 @@ object FormMain: TFormMain
       AnchorSideTop.Side = asrBottom
       Left = 4
       Height = 15
-      Top = 439
+      Top = 473
       Width = 110
       BorderSpacing.Left = 4
       BorderSpacing.Right = 4
@@ -300,7 +301,7 @@ object FormMain: TFormMain
       AnchorSideTop.Side = asrBottom
       Left = 4
       Height = 15
-      Top = 424
+      Top = 458
       Width = 113
       BorderSpacing.Left = 4
       BorderSpacing.Right = 4
@@ -313,10 +314,10 @@ object FormMain: TFormMain
       AnchorSideTop.Side = asrBottom
       Left = 8
       Height = 15
-      Top = 298
+      Top = 332
       Width = 94
       BorderSpacing.Left = 4
-      BorderSpacing.Top = 12
+      BorderSpacing.Top = 8
       BorderSpacing.Around = 4
       Caption = 'Calculation mode'
       ParentColor = False
@@ -325,13 +326,10 @@ object FormMain: TFormMain
       AnchorSideLeft.Control = LabelCalcMode
       AnchorSideTop.Control = LabelCalcMode
       AnchorSideTop.Side = asrBottom
-      AnchorSideRight.Control = GroupBoxWeaponStats
-      AnchorSideRight.Side = asrBottom
       Left = 8
       Height = 23
-      Top = 317
+      Top = 351
       Width = 146
-      Anchors = [akTop, akLeft, akRight]
       BorderSpacing.Right = 8
       BorderSpacing.Bottom = 12
       ItemHeight = 15
@@ -341,8 +339,41 @@ object FormMain: TFormMain
         'Real-world accurate'
       )
       Style = csDropDownList
-      TabOrder = 5
+      TabOrder = 6
       Text = 'Alienation default'
+    end
+    object LabelWeaponType: TLabel
+      AnchorSideLeft.Control = GroupBoxWeaponStats
+      AnchorSideTop.Control = GroupBoxWeaponStats
+      Left = 8
+      Height = 15
+      Top = 8
+      Width = 70
+      BorderSpacing.Left = 4
+      BorderSpacing.Top = 4
+      BorderSpacing.Around = 4
+      Caption = 'Weapon type'
+      ParentColor = False
+    end
+    object ComboBoxWeaponType: TComboBox
+      AnchorSideLeft.Control = LabelWeaponType
+      AnchorSideTop.Control = LabelWeaponType
+      AnchorSideTop.Side = asrBottom
+      Left = 8
+      Height = 23
+      Top = 27
+      Width = 146
+      BorderSpacing.Right = 8
+      ItemHeight = 15
+      ItemIndex = 0
+      Items.Strings = (
+        'Standard'
+        'Devastator'
+        'Collapser'
+      )
+      Style = csDropDownList
+      TabOrder = 0
+      Text = 'Standard'
     end
   end
   object GroupBoxSlots: TGroupBox
@@ -1891,8 +1922,6 @@ object FormMain: TFormMain
     end
     object LabelStatus: TLabel
       AnchorSideLeft.Control = GroupBoxSlots
-      AnchorSideTop.Control = LabelSynergy9Bonus
-      AnchorSideTop.Side = asrBottom
       AnchorSideRight.Control = GroupBoxSlots
       AnchorSideRight.Side = asrBottom
       AnchorSideBottom.Control = LabelSynergyBlocks

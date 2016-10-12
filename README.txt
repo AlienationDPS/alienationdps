@@ -1,5 +1,5 @@
 Doc's Alienation Weapon DPS Calculator by Dr C (drcpsn@hotmail.com)
-Release 1.0 (5 Oct 2016)
+Release 1.01 (12 Oct 2016)
 
 A small app designed to optimize cores for weapons in the PS4 game Alienation.
 
@@ -27,3 +27,12 @@ To build:
    2) Extract AlienationDPS source archive
    3) Open project file (alienationdps.lpi) in Lazarus
    4) Hit Run -> Build
+
+
+4) Changelog:
+
+Version 1.0 (5 Oct 2016)
+- Initial release
+
+Version 1.01 (12 Oct 2016)
+- Added support for Devastator and Collapser

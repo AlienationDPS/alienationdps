@@ -123,11 +123,12 @@ begin
  SpinEditPrismatic.Value:=corelimits[4];
 
  CheckBoxMinDamage.Checked:=mindamagepershotlimitenabled;
+ CheckBoxMinDamage.Caption:='Minimum damage per '+damage_per_shot_units_[weapontype]+':';
  SpinEditMinDamage.Value:=mindamagepershotlimit;
  CheckBoxMinClip.Checked:=mindamagepercliplimitenabled;
  SpinEditMinClip.Value:=mindamagepercliplimit;
 
- LabelMinDamageDesc.Caption:='Conserve ammo by boosting damage per shot. Current damage per shot (includes chance of crits): '+double2s(avgdamagepershot,0)+' HP.';
+ LabelMinDamageDesc.Caption:='Conserve ammo by boosting average damage per '+damage_per_shot_units_[weapontype]+'. Current damage per '+damage_per_shot_units_[weapontype]+' (includes chance of crits): '+double2s(avgdamagepershot,0)+' HP.';
  LabelMinClipDesc.Caption:='Do more total damage from each clip so you have to reload less often. Current damage per clip: '+double2s(avgdamageperclip,0)+' HP.';
 
  CheckBoxChange(nil);
